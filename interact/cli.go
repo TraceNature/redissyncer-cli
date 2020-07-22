@@ -159,6 +159,8 @@ func getMainCmd(args []string) *cobra.Command {
 	//	fmt.Println(v.Use)
 	//}
 	readlinecompleter = readline.NewPrefixCompleter(GenCompleter(rootCmd)...)
+
+	//readlinecompleter = readline.NewPrefixCompleter(readline.PcItem("start", readline.PcItem("--abc")))
 	//rc := readline.NewPrefixCompleter(GenCompleter(rootCmd)...)
 	//for _, v := range rc.Children {
 	//	fmt.Println(v.GetName())
@@ -330,8 +332,21 @@ func GenCompleter(cmd *cobra.Command) []readline.PrefixCompleterInterface {
 	pc := []readline.PrefixCompleterInterface{}
 	if len(cmd.Commands()) != 0 {
 		for _, v := range cmd.Commands() {
-			//fmt.Println(strings.Split(v.Use, " ")[0])
-			pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], GenCompleter(v)...))
+			//fmt.Println(strings.Split(v.Use, " ")[0]
+			if v.HasFlags() {
+				flagspc := []readline.PrefixCompleterInterface{}
+
+				flaguseages := strings.Split(strings.Trim(v.Flags().FlagUsages(), " "), "\n")
+
+				for i := 0; i < len(flaguseages)-1; i++ {
+					flagspc = append(flagspc, readline.PcItem(strings.Split(strings.Trim(flaguseages[i], " "), " ")[0]))
+				}
+				flagspc = append(flagspc, GenCompleter(v)...)
+				pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], flagspc...))
+
+			} else {
+				pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], GenCompleter(v)...))
+			}
 		}
 	}
 	return pc

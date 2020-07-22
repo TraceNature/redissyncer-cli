@@ -54,6 +54,7 @@ func NewTaskStartCommand() *cobra.Command {
 	}
 
 	sc.Flags().Bool("afresh", false, "afresh task from begin")
+	sc.Flags().Bool("bfresh", false, "")
 	return sc
 }
 
@@ -215,7 +216,7 @@ func createTaskSourceCommandFunc(cmd *cobra.Command, args []string) {
 }
 func startTaskCommandFunc(cmd *cobra.Command, args []string) {
 	if len(args) != 1 {
-		cmd.PrintErrln("must input task ids 'id1,id2,...'")
+		cmd.PrintErrln("must input task id'")
 		return
 	}
 
@@ -240,7 +241,7 @@ func startTaskCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	startreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.CreateTaskPath,
+		Api:    httpquerry.StartTaskPath,
 		Body:   string(startjsonStr),
 	}
 

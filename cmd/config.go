@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"interactioncli/commons"
 )
 
 // NewConfigCommand return a config subcommand of rootCmd
@@ -12,7 +13,7 @@ func NewConfigCommand() *cobra.Command {
 		Short: "tune pd configs",
 	}
 	conf.AddCommand(NewShowConfigCommand())
-	conf.AddCommand(NewSetConfigCommand())
+	//conf.AddCommand(NewSetConfigCommand())
 
 	return conf
 }
@@ -25,9 +26,9 @@ func NewShowConfigCommand() *cobra.Command {
 		Run:   showConfigCommandFunc,
 	}
 	sc.AddCommand(NewShowAllConfigCommand())
-	sc.AddCommand(NewShowScheduleConfigCommand())
-	sc.AddCommand(NewShowReplicationConfigCommand())
-	sc.AddCommand(NewShowLabelPropertyCommand())
+	//sc.AddCommand(NewShowScheduleConfigCommand())
+	//sc.AddCommand(NewShowReplicationConfigCommand())
+	//sc.AddCommand(NewShowLabelPropertyCommand())
 
 	return sc
 }
@@ -119,5 +120,10 @@ func showLabelPropertyConfigCommandFunc(cmd *cobra.Command, args []string) {
 }
 
 func showAllConfigCommandFunc(cmd *cobra.Command, args []string) {
-	cmd.Println(viper.AllSettings())
+	configs, err := commons.MapToYamlString(viper.AllSettings())
+	if err != nil {
+		cmd.PrintErrln(err)
+		return
+	}
+	cmd.Println(configs)
 }
