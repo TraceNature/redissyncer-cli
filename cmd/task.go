@@ -156,7 +156,7 @@ func createTaskCommandFunc(cmd *cobra.Command, args []string) {
 		//}
 		createreq := &httpquerry.Request{
 			Server: viper.GetString("syncserver"),
-			Api:    httpquerry.CreateTaskPath,
+			Api:    httpquerry.UrlCreateTask,
 			Body:   v,
 		}
 
@@ -201,7 +201,7 @@ func createTaskSourceCommandFunc(cmd *cobra.Command, args []string) {
 
 		createreq := &httpquerry.Request{
 			Server: viper.GetString("syncserver"),
-			Api:    httpquerry.CreateTaskPath,
+			Api:    httpquerry.UrlCreateTask,
 			Body:   string(json),
 		}
 
@@ -241,7 +241,7 @@ func startTaskCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	startreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.StartTaskPath,
+		Api:    httpquerry.UrlStartTask,
 		Body:   string(startjsonStr),
 	}
 
@@ -265,7 +265,7 @@ func stopTaskCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	stopreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.StopTaskPath,
+		Api:    httpquerry.UrlStopTask,
 		Body:   string(stopjsonStr),
 	}
 
@@ -289,7 +289,7 @@ func removeTaskCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	removereq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.RemoveTaskPath,
+		Api:    httpquerry.UrlRemoveTask,
 		Body:   string(removejsonStr),
 	}
 
@@ -315,7 +315,7 @@ func taskStatusAllCommandFunc(cmd *cobra.Command, args []string) {
 
 	listreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.ListTasksPath,
+		Api:    httpquerry.UrlListTasks,
 		Body:   string(listtaskjsonStr),
 	}
 
@@ -323,6 +323,13 @@ func taskStatusAllCommandFunc(cmd *cobra.Command, args []string) {
 
 	if resperr != nil {
 		cmd.PrintErr(resperr)
+		return
+	}
+
+	code := gjson.Get(listresp, "code").String()
+
+	if code != "2000" {
+		cmd.Println(listresp)
 		return
 	}
 
@@ -366,7 +373,7 @@ func taskStatusBynameCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	listreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.ListTasksPath,
+		Api:    httpquerry.UrlListTasks,
 		Body:   string(listtaskjsonStr),
 	}
 
@@ -392,7 +399,7 @@ func taskStatusBytaskidCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	listreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.ListTasksPath,
+		Api:    httpquerry.UrlListTasks,
 		Body:   string(listtaskjsonStr),
 	}
 
@@ -419,7 +426,7 @@ func taskStatusBygroupidCommandFunc(cmd *cobra.Command, args []string) {
 	}
 	listreq := &httpquerry.Request{
 		Server: viper.GetString("syncserver"),
-		Api:    httpquerry.ListTasksPath,
+		Api:    httpquerry.UrlListTasks,
 		Body:   string(listtaskjsonStr),
 	}
 

@@ -2,7 +2,6 @@ package interact
 
 import (
 	"fmt"
-	"github.com/c-bata/go-prompt"
 	"github.com/chzyer/readline"
 	"github.com/mattn/go-shellwords"
 	"github.com/spf13/cobra"
@@ -39,44 +38,8 @@ var LivePrefixState struct {
 }
 
 var query = ""
-var suggest = []prompt.Suggest{
-	//config
-	{Text: "config", Description: "config env"},
-	{Text: "show ", Description: "show config"},
-	{Text: "set ", Description: "set config"},
-	{Text: "delete ", Description: "delete"},
 
-
-	//task
-	{Text: "task", Description: "about task"},
-	{Text: "create ", Description: "create task"},
-	{Text: "start ", Description: "start task"},
-	{Text: "--afresh", Description: "start task afresh"},
-	{Text: "remove ", Description: "remove task"},
-	{Text: "stop ", Description: "stop task"},
-	{Text: "status ", Description: "query task status"},
-	{Text: "byname ", Description: "query task status by task name"},
-	{Text: "bytaskid ", Description: "query task status by task id"},
-	{Text: "bygroupid ", Description: "query task status by task group id"},
-	{Text: "all ", Description: "query all tasks status "},
-}
-
-var readlinecompleter *readline.PrefixCompleter
-
-//var readlinecompleter = readline.NewPrefixCompleter(
-//	readline.PcItem("task",
-//		readline.PcItem("create"),
-//		readline.PcItem("start",
-//			readline.PcItem("--afresh")),
-//		readline.PcItem("stop"),
-//		readline.PcItem("remove"),
-//		readline.PcItem("status",
-//			readline.PcItem("all"),
-//			readline.PcItem("byname"),
-//			readline.PcItem("bytaskid"),
-//			readline.PcItem("bygroupid")),
-//	),
-//)
+var readLineCompleter *readline.PrefixCompleter
 
 func init() {
 	cobra.EnablePrefixMatching = true
@@ -85,7 +48,7 @@ func init() {
 }
 
 func cliRun(cmd *cobra.Command, args []string) {
-	viper.Set("syncserver", syncserver)
+	//viper.Set("syncserver", syncserver)
 
 	if interact {
 		err := check.CheckEnv()
@@ -118,7 +81,9 @@ func getBasicCmd() *cobra.Command {
 	rootCmd.AddCommand(
 		cmd.NewConfigCommand(),
 		cmd.NewTaskCommand(),
-		cmd.NewCompareCommand(),
+		cmd.NewLoginCommand(),
+		cmd.NewLogoutCommand(),
+		//cmd.NewCompareCommand(),
 	)
 
 	rootCmd.Flags().ParseErrorsWhitelist.UnknownFlags = true
@@ -134,7 +99,6 @@ func getInteractCmd(args []string) *cobra.Command {
 	rootCmd.SetArgs(args)
 	rootCmd.ParseFlags(args)
 	rootCmd.SetOut(os.Stdout)
-	//rootCmd.SetOutput(os.Stdout)
 	hiddenFlag(rootCmd)
 
 	return rootCmd
@@ -158,10 +122,10 @@ func getMainCmd(args []string) *cobra.Command {
 	//for _, v := range rootCmd.Commands() {
 	//	fmt.Println(v.Use)
 	//}
-	readlinecompleter = readline.NewPrefixCompleter(GenCompleter(rootCmd)...)
+	readLineCompleter = readline.NewPrefixCompleter(genCompleter(rootCmd)...)
 
-	//readlinecompleter = readline.NewPrefixCompleter(readline.PcItem("start", readline.PcItem("--abc")))
-	//rc := readline.NewPrefixCompleter(GenCompleter(rootCmd)...)
+	//readLineCompleter = readline.NewPrefixCompleter(readline.PcItem("start", readline.PcItem("--abc")))
+	//rc := readline.NewPrefixCompleter(genCompleter(rootCmd)...)
 	//for _, v := range rc.Children {
 	//	fmt.Println(v.GetName())
 	//}
@@ -189,12 +153,6 @@ func Start(args []string) {
 
 func startCmd(getCmd func([]string) *cobra.Command, args []string) {
 	rootCmd := getCmd(args)
-	//if len(commandFlags.CAPath) != 0 {
-	//	if err := command.InitHTTPSClient(commandFlags.CAPath, commandFlags.CertPath, commandFlags.KeyPath); err != nil {
-	//		rootCmd.Println(err)
-	//		return
-	//	}
-	//}
 
 	if err := rootCmd.Execute(); err != nil {
 		rootCmd.Println(err)
@@ -217,10 +175,6 @@ func initConfig() {
 		viper.SetConfigName(".config")
 	}
 
-	// If a config file is found, read it in.
-	//if err := viper.ReadInConfig(); err != nil {
-	//	Confignotseterr = err
-	//}
 	viper.ReadInConfig()
 
 	viper.AutomaticEnv() // read in environment variables that match
@@ -233,10 +187,10 @@ func initConfig() {
 
 func loop() {
 	rl, err := readline.NewEx(&readline.Config{
-		//Prompt:            "\033[31m»\033[0m ",
+
 		Prompt:                 "redissyncer-cli>",
 		HistoryFile:            "/tmp/readline.tmp",
-		AutoComplete:           readlinecompleter,
+		AutoComplete:           readLineCompleter,
 		DisableAutoSaveHistory: true,
 		InterruptPrompt:        "^C",
 		EOFPrompt:              "^D",
@@ -275,7 +229,7 @@ func loop() {
 		}
 		cmd := strings.Join(cmds, " ")
 		cmds = cmds[:0]
-		rl.SetPrompt("redissyncer-cli> ")
+		rl.SetPrompt("redissyncer-cli>")
 		rl.SaveHistory(cmd)
 
 		args, err := shellwords.Parse(cmd)
@@ -292,61 +246,20 @@ func loop() {
 	}
 }
 
-func completer(in prompt.Document) []prompt.Suggest {
-	w := in.GetWordBeforeCursor()
-
-	if w == "" {
-		return []prompt.Suggest{}
-	}
-
-	return prompt.FilterHasPrefix(suggest, w, true)
-}
-
-func executor(in string) {
-	//fmt.Println(in)
-	if strings.ToLower(in) == "exit" {
-		os.Exit(0)
-	}
-
-	args, err := shellwords.Parse(in)
-	if err != nil {
-		fmt.Printf("parse command err: %v\n", err)
-		return
-	}
-	Start(args)
-}
-
-func ListCommandTree(cmd *cobra.Command, level int) {
-	if len(cmd.Commands()) != 0 {
-		for _, v := range cmd.Commands() {
-			for i := 0; i < level; i++ {
-				fmt.Print("    ")
-			}
-			fmt.Println(strings.Split(v.Use, " ")[0])
-			ListCommandTree(v, level+1)
-		}
-	}
-}
-
-func GenCompleter(cmd *cobra.Command) []readline.PrefixCompleterInterface {
+func genCompleter(cmd *cobra.Command) []readline.PrefixCompleterInterface {
 	pc := []readline.PrefixCompleterInterface{}
-	if len(cmd.Commands()) != 0 {
-		for _, v := range cmd.Commands() {
-			//fmt.Println(strings.Split(v.Use, " ")[0]
-			if v.HasFlags() {
-				flagspc := []readline.PrefixCompleterInterface{}
 
-				flaguseages := strings.Split(strings.Trim(v.Flags().FlagUsages(), " "), "\n")
-
-				for i := 0; i < len(flaguseages)-1; i++ {
-					flagspc = append(flagspc, readline.PcItem(strings.Split(strings.Trim(flaguseages[i], " "), " ")[0]))
-				}
-				flagspc = append(flagspc, GenCompleter(v)...)
-				pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], flagspc...))
-
-			} else {
-				pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], GenCompleter(v)...))
+	for _, v := range cmd.Commands() {
+		if v.HasFlags() {
+			flagsPc := []readline.PrefixCompleterInterface{}
+			flagUsages := strings.Split(strings.Trim(v.Flags().FlagUsages(), " "), "\n")
+			for i := 0; i < len(flagUsages)-1; i++ {
+				flagsPc = append(flagsPc, readline.PcItem(strings.Split(strings.Trim(flagUsages[i], " "), " ")[0]))
 			}
+			flagsPc = append(flagsPc, genCompleter(v)...)
+			pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], flagsPc...))
+		} else {
+			pc = append(pc, readline.PcItem(strings.Split(v.Use, " ")[0], genCompleter(v)...))
 		}
 	}
 	return pc
