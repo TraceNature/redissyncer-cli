@@ -3,6 +3,7 @@ package httpquerry
 import (
 	"encoding/json"
 	"errors"
+	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"net/http"
@@ -12,11 +13,14 @@ import (
 
 //var logger = globalzap.GetLogger()
 
-const CreateTaskPath = "/api/v2/createtask"
-const StartTaskPath = "/api/v2/starttask"
-const StopTaskPath = "/api/v2/stoptask"
-const RemoveTaskPath = "/api/v2/removetask"
-const ListTasksPath = "/api/v2/listtasks"
+const (
+	UrlLogin      = "/login"
+	UrlCreateTask = "/api/v2/createtask"
+	UrlStartTask  = "/api/v2/starttask"
+	UrlStopTask   = "/api/v2/stoptask"
+	UrlRemoveTask = "/api/v2/removetask"
+	UrlListTasks  = "/api/v2/listtasks"
+)
 
 type Request struct {
 	Server string
@@ -34,6 +38,8 @@ func (r Request) ExecRequest() (string, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-token", viper.GetString("token"))
+
 	resp, resperr := client.Do(req)
 
 	if resperr != nil {
@@ -55,11 +61,28 @@ func (r Request) ExecRequest() (string, error) {
 	return string(bodystr), nil
 }
 
+//登录
+func Login(syncserver, username, password string) (string, error) {
+	jsonMap := make(map[string]interface{})
+	jsonMap["username"] = username
+	jsonMap["password"] = password
+	loginJson, err := json.Marshal(jsonMap)
+	if err != nil {
+		return "", err
+	}
+	loginReq := &Request{
+		Server: syncserver,
+		Api:    UrlLogin,
+		Body:   string(loginJson),
+	}
+	return loginReq.ExecRequest()
+}
+
 //创建同步任务
 func CreateTask(syncserver string, createjson string) ([]string, error) {
 	createreq := &Request{
 		Server: syncserver,
-		Api:    CreateTaskPath,
+		Api:    UrlCreateTask,
 		Body:   createjson,
 	}
 
@@ -90,7 +113,7 @@ func StartTask(syncserver string, taskid string) (string, error) {
 	}
 	startreq := &Request{
 		Server: syncserver,
-		Api:    StartTaskPath,
+		Api:    UrlStartTask,
 		Body:   string(startjson),
 	}
 	return startreq.ExecRequest()
@@ -108,7 +131,7 @@ func StopTaskByIds(syncserver string, ids []string) (string, error) {
 	}
 	stopreq := &Request{
 		Server: syncserver,
-		Api:    StopTaskPath,
+		Api:    UrlStopTask,
 		Body:   string(stopjsonStr),
 	}
 	return stopreq.ExecRequest()
@@ -135,14 +158,14 @@ func RemoveTaskByName(syncserver string, taskname string) (string, error) {
 	}
 	stopreq := &Request{
 		Server: syncserver,
-		Api:    StopTaskPath,
+		Api:    UrlStopTask,
 		Body:   string(stopjsonStr),
 	}
 	stopreq.ExecRequest()
 
 	removereq := &Request{
 		Server: syncserver,
-		Api:    RemoveTaskPath,
+		Api:    UrlRemoveTask,
 		Body:   string(stopjsonStr),
 	}
 
@@ -163,7 +186,7 @@ func GetTaskStatus(syncserver string, ids []string) (map[string]string, error) {
 	}
 	listreq := &Request{
 		Server: syncserver,
-		Api:    ListTasksPath,
+		Api:    UrlListTasks,
 		Body:   string(listtaskjsonStr),
 	}
 	listresp, err := listreq.ExecRequest()
@@ -202,7 +225,7 @@ func GetSameTaskNameIds(syncserver string, taskname string) ([]string, error) {
 	}
 	listtaskreq := &Request{
 		Server: syncserver,
-		Api:    ListTasksPath,
+		Api:    UrlListTasks,
 		Body:   string(listjsonStr),
 	}
 	listresp, err := listtaskreq.ExecRequest()
