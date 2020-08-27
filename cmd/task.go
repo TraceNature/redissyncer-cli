@@ -58,15 +58,6 @@ func NewTaskStartCommand() *cobra.Command {
 	return sc
 }
 
-//func NewTaskStartAfreshCommand() *cobra.Command {
-//	sc := &cobra.Command{
-//		Use:   "afresh",
-//		Short: "start task afresh",
-//		Run:   startTaskCommandFunc,
-//	}
-//	return sc
-//}
-
 func NewTaskStopCommand() *cobra.Command {
 	sc := &cobra.Command{
 		Use:   "stop [taskid1 taskid2 ...]",
@@ -136,24 +127,12 @@ func NewTaskStatusBygroupidCommand() *cobra.Command {
 }
 
 func createTaskCommandFunc(cmd *cobra.Command, args []string) {
-	//if len(args) != 1 {
-	//	cmd.PrintErrln("Must specific create task json or jsonfile")
-	//	return
-	//}
 	cmdpath := strings.Split(cmd.CommandPath(), " ")
 
 	if cmdpath[len(cmdpath)-1] == "source" {
 		return
 	}
 	for _, v := range args {
-		//jsonmap := make(map[string]interface{})
-		//jsonmap["taskid"] = args[0]
-		//
-		//createjsonStr, err := json.Marshal(jsonmap)
-		//if err != nil {
-		//	cmd.PrintErr(err)
-		//	return
-		//}
 		createreq := &httpquerry.Request{
 			Server: viper.GetString("syncserver"),
 			Api:    httpquerry.UrlCreateTask,
@@ -168,10 +147,6 @@ func createTaskCommandFunc(cmd *cobra.Command, args []string) {
 
 		cmd.Println(createresp)
 	}
-
-	//cmd.Println(args[0])
-	//cmd.Println(viper.Get("syncserver"))
-	//viper.Set("a", time.Now())
 }
 func createTaskSourceCommandFunc(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
