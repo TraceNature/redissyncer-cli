@@ -48,14 +48,16 @@ func init() {
 }
 
 func cliRun(cmd *cobra.Command, args []string) {
-	//viper.Set("syncserver", syncserver)
-
+	banner := "\n    ____           ___      _____                                       ___ \n   / __ \\___  ____/ (_)____/ ___/__  ______  ________  _____      _____/ (_)\n  / /_/ / _ \\/ __  / / ___/\\__ \\/ / / / __ \\/ ___/ _ \\/ ___/_____/ ___/ / / \n / _, _/  __/ /_/ / (__  )___/ / /_/ / / / / /__/  __/ /  /_____/ /__/ / /  \n/_/ |_|\\___/\\__,_/_/____//____/\\__, /_/ /_/\\___/\\___/_/         \\___/_/_/   \n                              /____/                                        \n"
+	
 	if interact {
 		err := check.CheckEnv()
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
+
+		cmd.Println(banner)
 		cmd.Println("Input 'help;' for usage. \nCommand must end with ';'. \n'tab' for command complete.\n^C or exit to quit.")
 		loop()
 		return
@@ -83,7 +85,7 @@ func getBasicCmd() *cobra.Command {
 		cmd.NewTaskCommand(),
 		cmd.NewLoginCommand(),
 		cmd.NewLogoutCommand(),
-		//cmd.NewCompareCommand(),
+
 	)
 
 	rootCmd.Flags().ParseErrorsWhitelist.UnknownFlags = true
@@ -119,17 +121,7 @@ func getMainCmd(args []string) *cobra.Command {
 	rootCmd.ParseFlags(args)
 	rootCmd.SetOut(os.Stdout)
 
-	//for _, v := range rootCmd.Commands() {
-	//	fmt.Println(v.Use)
-	//}
 	readLineCompleter = readline.NewPrefixCompleter(genCompleter(rootCmd)...)
-
-	//readLineCompleter = readline.NewPrefixCompleter(readline.PcItem("start", readline.PcItem("--abc")))
-	//rc := readline.NewPrefixCompleter(genCompleter(rootCmd)...)
-	//for _, v := range rc.Children {
-	//	fmt.Println(v.GetName())
-	//}
-
 	return rootCmd
 }
 
@@ -188,7 +180,7 @@ func initConfig() {
 func loop() {
 	rl, err := readline.NewEx(&readline.Config{
 
-		Prompt:                 "redissyncer-cli>",
+		Prompt:                 "redissyncer-cli> ",
 		HistoryFile:            "/tmp/readline.tmp",
 		AutoComplete:           readLineCompleter,
 		DisableAutoSaveHistory: true,
@@ -229,7 +221,7 @@ func loop() {
 		}
 		cmd := strings.Join(cmds, " ")
 		cmds = cmds[:0]
-		rl.SetPrompt("redissyncer-cli>")
+		rl.SetPrompt("redissyncer-cli> ")
 		rl.SaveHistory(cmd)
 
 		args, err := shellwords.Parse(cmd)
@@ -237,11 +229,6 @@ func loop() {
 			fmt.Printf("parse command err: %v\n", err)
 			continue
 		}
-
-		//args = append(args, "-u", commandFlags.URL)
-		//if commandFlags.CAPath != "" && commandFlags.CertPath != "" && commandFlags.KeyPath != "" {
-		//	args = append(args, "--cacert", commandFlags.CAPath, "--cert", commandFlags.CertPath, "--key", commandFlags.KeyPath)
-		//}
 		Start(args)
 	}
 }
