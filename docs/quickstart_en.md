@@ -1,5 +1,5 @@
 # redissyncer-cli
-
+[简体中文](quickstart.md)
 The client cli tool of redissyncer facilitates the operation of migration tasks.
 
 ## Build

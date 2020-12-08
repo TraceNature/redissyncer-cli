@@ -1,4 +1,7 @@
 # redissyncer-cli
+
+[English](quickstart_en.md)
+
 redissyncer 的客户端cli工具，方便迁移任务操作。
 
 ## 构建
@@ -19,6 +22,7 @@ go build -o redissyncer-cli
   ``` yaml  
   server: http://10.0.0.100:8080
   ```
+
 * 对于开启用户校验的服务，先通过"redissyncer-cli login username password" 获取token，然后将 token 写入config文件
   
   ``` yaml  
@@ -77,7 +81,7 @@ go build -o redissyncer-cli
     ```shell
     redissyncer-cli> task status bytaskid 690DEF6222E34443884033B860CE01EC;
     ```
-    
+
   * 查看通过任务名称查看任务状态
 
     ```shell
