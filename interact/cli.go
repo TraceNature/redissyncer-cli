@@ -49,7 +49,7 @@ func init() {
 
 func cliRun(cmd *cobra.Command, args []string) {
 	banner := "\n    ____           ___      _____                                       ___ \n   / __ \\___  ____/ (_)____/ ___/__  ______  ________  _____      _____/ (_)\n  / /_/ / _ \\/ __  / / ___/\\__ \\/ / / / __ \\/ ___/ _ \\/ ___/_____/ ___/ / / \n / _, _/  __/ /_/ / (__  )___/ / /_/ / / / / /__/  __/ /  /_____/ /__/ / /  \n/_/ |_|\\___/\\__,_/_/____//____/\\__, /_/ /_/\\___/\\___/_/         \\___/_/_/   \n                              /____/                                        \n"
-	
+
 	if interact {
 		err := check.CheckEnv()
 		if err != nil {
@@ -85,7 +85,6 @@ func getBasicCmd() *cobra.Command {
 		cmd.NewTaskCommand(),
 		cmd.NewLoginCommand(),
 		cmd.NewLogoutCommand(),
-
 	)
 
 	rootCmd.Flags().ParseErrorsWhitelist.UnknownFlags = true
