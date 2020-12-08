@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"github.com/olekukonko/tablewriter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tidwall/gjson"
@@ -10,7 +11,6 @@ import (
 	"io/ioutil"
 	"os"
 	"strings"
-	"github.com/olekukonko/tablewriter"
 )
 
 func NewTaskCommand() *cobra.Command {
