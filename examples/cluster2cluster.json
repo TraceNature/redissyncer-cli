@@ -1,0 +1,11 @@
+{
+  "sourcePassword": "testredis0102",
+  "sourceRedisAddress": "11.67.67.7:36379;11.67.83.163:36379;11.67.112.67:36379",
+  "targetRedisAddress": "11.67.67.7:16379;11.67.67.7:16380;11.67.83.163:16379;11.67.83.163:16380;11.67.112.67:16379;11.67.112.67:16380",
+  "targetPassword": "testredis0102",
+  "taskName": "cluster2cluster",
+  "targetRedisVersion": 4.0,
+  "autostart": true,
+  "afresh": true,
+  "batchSize": 100
+}
