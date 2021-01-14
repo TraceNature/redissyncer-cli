@@ -2,7 +2,7 @@ BINARY="redissyncer-cli"
 LINUX="linux-amd64"
 DARWIN="darwin-adm64"
 WIN="windows-amd64"
-VERSION=1.0.0
+VERSION=0.1.0
 BUILD=`date +%FT%T%z`
 
 PACKAGES=`go list ./... | grep -v /vendor/`
