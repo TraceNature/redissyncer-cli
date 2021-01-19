@@ -14,12 +14,13 @@ import (
 //var logger = globalzap.GetLogger()
 
 const (
-	UrlLogin      = "/login"
-	UrlCreateTask = "/api/v2/createtask"
-	UrlStartTask  = "/api/v2/starttask"
-	UrlStopTask   = "/api/v2/stoptask"
-	UrlRemoveTask = "/api/v2/removetask"
-	UrlListTasks  = "/api/v2/listtasks"
+	UrlLogin       = "/login"
+	UrlCreateTask  = "/api/v2/createtask"
+	UrlStartTask   = "/api/v2/starttask"
+	UrlStopTask    = "/api/v2/stoptask"
+	UrlRemoveTask  = "/api/v2/removetask"
+	UrlListTasks   = "/api/v2/listtasks"
+	ImportFilePath = "/api/v2/file/createtask"
 )
 
 type Request struct {
