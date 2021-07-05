@@ -15,16 +15,16 @@ go build -o redissyncer-cli
 
 * redissyncer-cli supports command line mode and interactive mode, "redissyncer-cli -i" enters interactive mode
 * The client program is used by the redissyncer client program to create, start and stop, and monitor redis synchronization tasks. Please ensure that the server program is running normally before using this Cui
-* The config.yml file is used to describe the basic configuration of the server link. The program reads .config.yml in the current directory by default, and the file name and path can also be customized
+* The .config.yaml file is used to describe the basic configuration of the server link. The program reads .config.yaml in the current directory by default, and the file name and path can also be customized
 
   ``` yaml  
-  server: http://10.0.0.100:8080
+  syncserver: http://10.0.0.100:8080
   ```
 
 * For services that enable user verification, first obtain the token through "redissyncer-cli login username password", and then write the token into the config file
   
   ``` yaml  
-  server: http://10.0.0.100:8080
+  syncserver: http://10.0.0.100:8080
   token: 379F5E2BD55A4608B6A7557F0583CFC5
   ```
 
