@@ -23,7 +23,7 @@ go build -o redissyncer-cli
   syncserver: http://10.0.0.100:8080
   ```
 
-* 对于开启用户校验的服务，先通过"redissyncer-cli login username password" 获取token，然后将 token 写入config文件
+* 对于开启用户校验的服务，先通过"redissyncer-cli login username password" (默认密码 admin 123456) 获取token，然后将 token 写入config文件
   
   ``` yaml  
   syncserver: http://10.0.0.100:8080
