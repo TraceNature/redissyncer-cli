@@ -66,7 +66,7 @@ go build -o redissyncer-cli
    redissyncer-cli> task create source ./createtask.json;
    ```
 
-   详细配置参数详见[API文档](api.md)
+   详细配置参数详见[API文档](https://github.com/TraceNature/redissyncer-server/blob/main/docs/api.md)
 
 
 * 查看任务
