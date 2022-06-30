@@ -1,4 +1,2 @@
-syncserver: http://11.7.27.16:8080
-token: 379F5E2BD55A4608B6A7557F0583CFC5
-
-
+syncserver: http://redissyncer.server
+token: DDFFD12CFE16438DAC446A3915F4C8D5

@@ -16,17 +16,17 @@ go build -o redissyncer-cli
 ## 功能与使用方法
 
 * redissyncer-cli支持命令行模式和交互模式，"redissyncer-cli -i"进入交互模式
-* 该客户端程序为redissyncer客户端程序用与创建、启停、监控redis同步任务，在使用本Cui之前请确保服务端程序正常运行
-* config.yml文件用于描述服务器链接的基本配置，程序默认读取当前目录下的 .config.yml，也可自定义文件名称及路径
+* 该客户端程序为redissyncer客户端程序用与创建、启停、监控redis同步任务，在使用本客户端之前请确保服务端程序正常运行
+* .config.yaml文件用于描述服务器链接的基本配置，程序默认读取当前目录下的 .config.yaml，也可自定义文件名称及路径
 
   ``` yaml  
-  server: http://10.0.0.100:8080
+  syncserver: http://10.0.0.100:8080
   ```
 
 * 对于开启用户校验的服务，先通过"redissyncer-cli login username password" 获取token，然后将 token 写入config文件
   
   ``` yaml  
-  server: http://10.0.0.100:8080
+  syncserver: http://10.0.0.100:8080
   token: 379F5E2BD55A4608B6A7557F0583CFC5
   ```
 

@@ -22,6 +22,11 @@
 *.rar
 # go ignore
 **/vendor
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
 #idea ignore
 **/.idea

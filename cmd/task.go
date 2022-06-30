@@ -19,6 +19,7 @@ func NewTaskCommand() *cobra.Command {
 		Short: "operate task",
 	}
 	task.AddCommand(NewTaskCreateCommand())
+	task.AddCommand(NewTaskImportCommand())
 	task.AddCommand(NewTaskStartCommand())
 	task.AddCommand(NewTaskStopCommand())
 	task.AddCommand(NewTaskRemoveCommand())
@@ -33,6 +34,26 @@ func NewTaskCreateCommand() *cobra.Command {
 		Run:   createTaskCommandFunc,
 	}
 	sc.AddCommand(NewTaskCreateSourceCommand())
+	return sc
+}
+
+func NewTaskImportCommand() *cobra.Command {
+	sc := &cobra.Command{
+		Use:   "import <task description>",
+		Short: "import task",
+		Run:   importCommandFunc,
+	}
+	sc.AddCommand(NewTaskImportSourceCommand())
+	return sc
+}
+
+func NewTaskImportSourceCommand() *cobra.Command {
+	sc := &cobra.Command{
+		Use:   "source <task description file path>",
+		Short: "import task from file",
+		Run:   importSourceCommandFunc,
+	}
+
 	return sc
 }
 
@@ -148,6 +169,30 @@ func createTaskCommandFunc(cmd *cobra.Command, args []string) {
 		cmd.Println(createresp)
 	}
 }
+
+func importCommandFunc(cmd *cobra.Command, args []string) {
+	cmdpath := strings.Split(cmd.CommandPath(), " ")
+
+	if cmdpath[len(cmdpath)-1] == "source" {
+		return
+	}
+	for _, v := range args {
+		createreq := &httpquerry.Request{
+			Server: viper.GetString("syncserver"),
+			Api:    httpquerry.ImportFilePath,
+			Body:   v,
+		}
+
+		createresp, err := createreq.ExecRequest()
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		cmd.Println(createresp)
+	}
+}
+
 func createTaskSourceCommandFunc(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
 		cmd.PrintErrln("Please input create json file path")
@@ -189,6 +234,49 @@ func createTaskSourceCommandFunc(cmd *cobra.Command, args []string) {
 		cmd.Println(createresp)
 	}
 }
+
+func importSourceCommandFunc(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		cmd.PrintErrln("Please input create json file path")
+		return
+	}
+
+	for _, v := range args {
+		if !commons.FileExists(v) {
+
+			cmd.PrintErrf("file %s not exists \n", v)
+			continue
+
+		}
+		jsonFile, err := os.Open(v)
+		defer jsonFile.Close()
+		if err != nil {
+			cmd.PrintErrln(err)
+			continue
+		}
+
+		json, err := ioutil.ReadAll(jsonFile)
+		if err != nil {
+			cmd.PrintErrln(err)
+			continue
+		}
+
+		createreq := &httpquerry.Request{
+			Server: viper.GetString("syncserver"),
+			Api:    httpquerry.ImportFilePath,
+			Body:   string(json),
+		}
+
+		createresp, err := createreq.ExecRequest()
+		if err != nil {
+			cmd.PrintErr(err)
+			return
+		}
+
+		cmd.Println(createresp)
+	}
+}
+
 func startTaskCommandFunc(cmd *cobra.Command, args []string) {
 	if len(args) != 1 {
 		cmd.PrintErrln("must input task id'")
